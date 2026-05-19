@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: arcana-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: arcana
+      MYSQL_USER: arcana
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-arcanapass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: arcana-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+pymysql://arcana:${MYSQL_PASSWORD:-arcanapass}@mysql:3306/arcana
+      SECRET_KEY: ${SECRET_KEY:-change-this-secret-key}
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      AI_SERVER_URL: http://ai-server:8001
+      ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  ai-server:
+    build: ./ai-server
+    container_name: arcana-ai-server
+    ports:
+      - "8001:8001"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      FAISS_INDEX_PATH: /app/faiss_index/
+      EMBEDDING_MODEL: text-embedding-3-small
+      LLM_MODEL: gpt-4o
+      LLM_MAX_TOKENS: 500
+    volumes:
+      - ./ai-server:/app
+    command: >
+      sh -c "python scripts/build_index.py && uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
+
+  frontend:
+    build: ./frontend
+    container_name: arcana-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

@@ -1,0 +1,41 @@
+CREATE DATABASE IF NOT EXISTS arcana CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE arcana;
+
+CREATE TABLE IF NOT EXISTS users (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email       VARCHAR(255) UNIQUE NOT NULL,
+  password    VARCHAR(255) NOT NULL,
+  nickname    VARCHAR(100) NOT NULL,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cards (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  name_ko     VARCHAR(100) NOT NULL,
+  name_en     VARCHAR(100) NOT NULL,
+  arcana      ENUM('major', 'minor') NOT NULL,
+  suit        VARCHAR(50) DEFAULT NULL,
+  number      TINYINT UNSIGNED DEFAULT NULL,
+  description TEXT,
+  image_url   VARCHAR(500)
+);
+
+CREATE TABLE IF NOT EXISTS readings (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id     BIGINT NOT NULL,
+  concern     TEXT NOT NULL,
+  result      LONGTEXT NOT NULL,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS selected_cards (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  reading_id  BIGINT NOT NULL,
+  card_id     INT NOT NULL,
+  position    TINYINT NOT NULL,
+  is_reversed BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (reading_id) REFERENCES readings(id) ON DELETE CASCADE,
+  FOREIGN KEY (card_id) REFERENCES cards(id)
+);

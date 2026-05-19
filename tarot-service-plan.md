@@ -199,7 +199,7 @@ mobile-first design, smooth fade transitions, cosmic atmosphere
 
 ## 10. 다음 단계
 
-1. **스펙 작성** — Spec Kit 기반으로 `specs/front`, `specs/backend`, `specs/ai-server` 문서화
+1. **스펙 작성** — `frontend/SPEC.md`, `backend/SPEC.md`, `ai-server/SPEC.md` 각 패키지에 위치
 2. **디자인 시안** — 스티치 AI 프롬프트 기반 Figma 시안 작성
 3. **레포지토리 생성** — GitHub 레포 초기화 + 스펙 push
 4. **개발 착수** — 백엔드 DB/API → AI 서버 → 프론트엔드 순으로 진행

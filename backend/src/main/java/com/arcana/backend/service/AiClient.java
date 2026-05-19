@@ -22,8 +22,8 @@ public class AiClient {
                     @Value("${ai-server.url}") String aiServerUrl,
                     @Value("${ai-server.timeout}") long timeoutMs) {
         this.restTemplate = builder
-                .connectTimeout(Duration.ofMillis(timeoutMs))
-                .readTimeout(Duration.ofMillis(timeoutMs))
+                .setConnectTimeout(Duration.ofMillis(timeoutMs))
+                .setReadTimeout(Duration.ofMillis(timeoutMs))
                 .build();
         this.aiServerUrl = aiServerUrl;
     }

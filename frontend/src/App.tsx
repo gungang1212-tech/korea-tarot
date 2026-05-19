@@ -8,6 +8,7 @@ import ReadingNew from "@/pages/ReadingNew";
 import ReadingResult from "@/pages/ReadingResult";
 import Mypage from "@/pages/Mypage";
 import MypageReadingDetail from "@/pages/MypageReadingDetail";
+import OAuth2Callback from "@/pages/OAuth2Callback";
 import { useAuthStore } from "@/stores/authStore";
 
 const queryClient = new QueryClient({
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/mypage/readings/:id" element={<MypageReadingDetail />} />
           </Route>
 
+          <Route path="/oauth2/callback" element={<OAuth2Callback />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

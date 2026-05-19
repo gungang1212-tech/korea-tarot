@@ -43,11 +43,16 @@ public class CardDataInitializer implements ApplicationRunner {
                 .suit(s.getSuit())
                 .number(s.getNumber())
                 .description(s.getUprightMeaning())
+                .imageUrl("/images/cards/" + toSlug(s.getNameEn()) + ".jpg")
                 .build()
         ).toList();
 
         cardRepository.saveAll(cards);
         log.info("Seeded {} tarot cards", cards.size());
+    }
+
+    private static String toSlug(String name) {
+        return name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
     }
 
     @Getter @Setter

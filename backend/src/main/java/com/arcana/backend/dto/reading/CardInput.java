@@ -1,5 +1,6 @@
 package com.arcana.backend.dto.reading;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,5 +15,6 @@ public class CardInput {
     private Integer position;
 
     @NotNull
+    @JsonProperty("is_reversed")
     private Boolean reversed;
 }

@@ -26,18 +26,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: mysql+pymysql://arcana:${MYSQL_PASSWORD:-arcanapass}@mysql:3306/arcana
-      SECRET_KEY: ${SECRET_KEY:-change-this-secret-key}
-      ACCESS_TOKEN_EXPIRE_MINUTES: 30
-      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      DB_URL: jdbc:mysql://mysql:3306/arcana?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      DB_USERNAME: arcana
+      DB_PASSWORD: ${MYSQL_PASSWORD:-arcanapass}
+      JWT_SECRET: ${JWT_SECRET:-arcana-super-secret-key-must-be-at-least-32-characters-long}
       AI_SERVER_URL: http://ai-server:8001
       ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   ai-server:
     build: ./ai-server

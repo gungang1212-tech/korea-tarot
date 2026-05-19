@@ -8,42 +8,68 @@
 
 ```
 arcana/
-├── frontend/         # React + TypeScript
-├── backend/          # FastAPI + MySQL
-├── ai-server/        # FastAPI + LangChain + FAISS
-├── specs/            # 서비스 스펙 문서
-│   ├── front/
-│   ├── backend/
-│   └── ai-server/
-├── tarot-service-plan.md   # 기획서
-└── README.md
+├── frontend/            # React 18 + TypeScript + Tailwind CSS
+├── backend/             # FastAPI + SQLAlchemy + MySQL
+├── ai-server/           # FastAPI + LangChain + FAISS + OpenAI
+├── docker-compose.yml
+├── init.sql
+├── .env.example
+├── tarot-service-plan.md
+├── backend-spec.md
+├── frontend-spec.md
+└── ai-server-spec.md
 ```
 
 ---
 
-## 서비스 실행 (로컬)
+## 빠른 시작 (Docker)
 
-### 1. 백엔드
+```bash
+cp .env.example .env
+# .env에 OPENAI_API_KEY 입력
+
+docker-compose up --build
+```
+
+- 프론트엔드: http://localhost:3000
+- 백엔드 API Docs: http://localhost:8000/docs
+- AI 서버 Docs: http://localhost:8001/docs
+
+---
+
+## 로컬 개발 환경
+
+### 1. MySQL
+
+```bash
+docker-compose up mysql -d
+```
+
+### 2. 백엔드
+
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
+python -m venv venv
+venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-cp .env.example .env  # 환경 변수 설정
-alembic upgrade head  # DB 마이그레이션
+cp .env.example .env    # DATABASE_URL, SECRET_KEY 설정
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. AI 서버
+### 3. AI 서버
+
 ```bash
 cd ai-server
-python -m venv venv && source venv/bin/activate
+python -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env  # OPENAI_API_KEY 설정
-python scripts/build_index.py  # FAISS 인덱스 최초 빌드
+cp .env.example .env    # OPENAI_API_KEY 설정
+python scripts/build_index.py   # FAISS 인덱스 최초 빌드 (1회)
 uvicorn app.main:app --reload --port 8001
 ```
 
-### 3. 프론트엔드
+### 4. 프론트엔드
+
 ```bash
 cd frontend
 npm install
@@ -53,11 +79,23 @@ npm run dev  # http://localhost:5173
 
 ---
 
-## 스펙 문서
+## 환경 변수
 
-| 문서 | 경로 |
+| 변수 | 설명 |
 |---|---|
-| 기획서 | `tarot-service-plan.md` |
-| 프론트엔드 스펙 | `specs/front/frontend-spec.md` |
-| 백엔드 스펙 | `specs/backend/backend-spec.md` |
-| AI 서버 스펙 | `specs/ai-server/ai-server-spec.md` |
+| `OPENAI_API_KEY` | OpenAI API 키 (필수) |
+| `SECRET_KEY` | JWT 서명 키 |
+| `MYSQL_PASSWORD` | MySQL 비밀번호 |
+
+---
+
+## 주요 기능 (MVP)
+
+- **회원가입 / 로그인** — JWT (Access 30분 + Refresh 7일 httpOnly Cookie)
+- **타로 리딩** — 고민 입력 → 78장 중 3장 선택 → AI 해석
+- **RAG 해석** — FAISS + LangChain으로 카드 설명 검색 후 GPT-4o로 해석 생성
+- **상담 기록** — MySQL 저장, 마이페이지에서 재조회
+
+---
+
+*본 서비스는 오락·자기탐색 목적입니다*
